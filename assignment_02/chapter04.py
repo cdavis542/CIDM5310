@@ -37,7 +37,10 @@ days_df = c19_df[c19_df.countriesAndTerritories.isin(c19_df.groupby('countriesAn
 
 print('\nQuestion 10b\n', days_df)
 
-avg_df = c19_df.groupby(['countriesAndTerritories', pd.Grouper(freq='1D')]).cases.sum().diff().unstack(level=0).rolling(7).mean().last("7D")[c19_df.groupby('countriesAndTerritories').sum('cases').nlargest(5, 'cases').index]
+avg_df = c19_df.assign(avg7 = lambda x: x.cases.rolling('7D').mean().diff())
+
+avg_df = avg_df.reset_index().pivot(index='date', columns='countriesAndTerritories', values='avg7').last('7D')[c19_df.groupby('countriesAndTerritories').sum('cases').nlargest(5, 'cases').index]
+
 
 print('\nQuestion 10c\n', avg_df)
 
